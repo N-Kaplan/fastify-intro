@@ -1,14 +1,55 @@
 //reference: https://www.fastify.io/docs/latest/Reference/TypeScript/
 
 import fastify from "fastify";
-import {request} from "https";
+import { FromSchema} from "json-schema-to-ts";
 
-//1. setup server
+//define schema as an object
+
+const todo = {
+    type: 'object',
+    properties: {
+        name: { type: 'string' },
+        description: { type: 'string' },
+        done: { type: 'boolean' },
+    },
+    required: ['name'],
+} as const;
+
+//build type from schema and use it in handler
+const f = fastify();
+f.post<{ Body: FromSchema<typeof todo> }>(
+    '/todo',
+    {
+        schema: {
+            body: todo,
+            response: {
+                201: {
+                    type: 'string',
+                },
+            },
+        }
+    },
+    async (request: any, reply: any): Promise<void> => {
+
+        /*
+        request.body has type
+        {
+          [x: string]: unknown;
+          description?: string;
+          done?: boolean;
+          name: string;
+        }
+        */
+
+        request.body.name // will not throw type error
+        request.body.notthere // will throw type error
+
+        reply.status(201).send();
+    },
+);
+
+//setup server
 const server = fastify();
-
-server.get('/ping', async (request, reply) => {
-    return 'pong\n'
-})
 
 server.listen(8080, (err, address) => {
     if (err) {
@@ -18,33 +59,3 @@ server.listen(8080, (err, address) => {
     console.log(`Server listening at ${address}`)
 })
 
-//2. Generics
-//define interfaces
-
-interface IQuerystring {
-    username: string;
-    password: string;
-}
-
-interface IHeaders {
-    'h-Custom': string;
-}
-
-//define new API route
-server.get<{
-    Querystring: IQuerystring,
-    Headers: IHeaders
-}>('/auth', {
-    //add preValidation hook
-    preValidation: (request, reply, done) => {
-        const { username, password } = request.query
-        done(username!=='admin' ? new Error('Must be admin') : undefined) // only validate admin account
-    }
-
-}, async (request, reply) => {
-    const { username, password } = request.query
-    const customerHeader = request.headers['h-Custom']
-    // do something with request data
-
-    return `logged in!`
-})
