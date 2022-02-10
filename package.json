@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/N-Kaplan/fastify-intro#readme",
   "dependencies": {
+    "@sinclair/typebox": "^0.23.3",
     "fastify": "^3.27.1"
   },
   "devDependencies": {

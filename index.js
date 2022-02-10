@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
+const typebox_1 = require("@sinclair/typebox");
 //1. setup server
 const server = (0, fastify_1.default)();
 server.get('/ping', async (request, reply) => {
@@ -29,4 +30,28 @@ server.get('/auth', {
     const customerHeader = request.headers['h-Custom'];
     // do something with request data
     return `logged in!`;
+});
+//3. define schema with typebox
+const User = typebox_1.Type.Object({
+    name: typebox_1.Type.String(),
+    mail: typebox_1.Type.Optional(typebox_1.Type.String({ format: 'email' })),
+});
+// use defined type and schema during definition of route
+const app = (0, fastify_1.default)();
+app.post("/", {
+    schema: {
+        body: User,
+        response: {
+            200: User,
+        },
+    },
+}, (request, reply) => {
+    const { body: user } = request;
+    /* user has type
+ * const user: StaticProperties<{
+ *  name: TString;
+ *  mail: TOptional<TString>;
+ * }>
+ */
+    reply.status(200).send(user);
 });

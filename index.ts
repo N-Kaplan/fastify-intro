@@ -1,7 +1,7 @@
 //reference: https://www.fastify.io/docs/latest/Reference/TypeScript/
 
 import fastify from "fastify";
-import {request} from "https";
+import { Static, Type } from '@sinclair/typebox';
 
 //1. setup server
 const server = fastify();
@@ -48,3 +48,35 @@ server.get<{
 
     return `logged in!`
 })
+
+//3. define schema with typebox
+const User = Type.Object({
+    name: Type.String(),
+    mail: Type.Optional(Type.String( { format: 'email'})),
+});
+type UserType = Static<typeof User>;
+
+// use defined type and schema during definition of route
+const app = fastify();
+
+app.post<{ Body: UserType; Reply: UserType }>(
+    "/",
+    {
+        schema: {
+            body: User,
+            response: {
+                200: User,
+            },
+        },
+    },
+    (request, reply) => {
+        const { body: user } = request;
+        /* user has type
+     * const user: StaticProperties<{
+     *  name: TString;
+     *  mail: TOptional<TString>;
+     * }>
+     */
+        reply.status(200).send(user);
+    }
+);
