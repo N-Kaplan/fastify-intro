@@ -1,0 +1,29 @@
+{
+  "name": "fastify-intro",
+  "version": "1.0.0",
+  "description": "introduction to fastify",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/N-Kaplan/fastify-intro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/N-Kaplan/fastify-intro/issues"
+  },
+  "homepage": "https://github.com/N-Kaplan/fastify-intro#readme",
+  "dependencies": {
+    "fastify": "^3.27.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.17",
+    "typescript": "^4.5.5"
+  }
+}
